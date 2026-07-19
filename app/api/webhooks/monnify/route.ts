@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { verifyWebhookSignature } from "@/lib/monnify";
+import { toNaira } from "@/lib/invoice";
 
 interface MonnifyWebhookPayload {
   eventType?: string;
@@ -8,6 +9,8 @@ interface MonnifyWebhookPayload {
     transactionReference?: string;
     paymentStatus?: string;
     paidOn?: string;
+    amountPaid?: number;
+    totalPayable?: number;
   };
 }
 
@@ -49,22 +52,50 @@ export async function POST(request: Request) {
     eventData?.paymentStatus === "PAID" &&
     eventData.paymentReference
   ) {
+    const reference = eventData.paymentReference;
+
+    // Match on the current reference, or one superseded by a silent link
+    // refresh — a buyer can complete payment on an old link in the window
+    // before/during a refresh, and that reference is still legitimately ours.
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        OR: [
+          { monnifyReference: reference },
+          { previousMonnifyReferences: { has: reference } },
+        ],
+      },
+    });
+
+    if (!invoice) {
+      console.warn("[monnify-webhook] no invoice matched reference", reference);
+      return new Response("OK", { status: 200 });
+    }
+
+    const paidAmount = eventData.amountPaid ?? eventData.totalPayable;
+    const expectedAmount = toNaira(invoice.total);
+    if (paidAmount == null || Math.abs(paidAmount - expectedAmount) > 0.01) {
+      console.warn(
+        "[monnify-webhook] amount mismatch for invoice",
+        invoice.id,
+        "expected",
+        expectedAmount,
+        "got",
+        paidAmount
+      );
+      return new Response("OK", { status: 200 });
+    }
+
     const paidOn = eventData.paidOn ? new Date(eventData.paidOn) : new Date();
 
-    const result = await prisma.invoice.updateMany({
-      where: { monnifyReference: eventData.paymentReference },
+    await prisma.invoice.update({
+      where: { id: invoice.id },
       data: {
         status: "PAID",
         paidAt: isNaN(paidOn.getTime()) ? new Date() : paidOn,
       },
     });
 
-    console.log(
-      "[monnify-webhook] matched",
-      result.count,
-      "invoice(s) for reference",
-      eventData.paymentReference
-    );
+    console.log("[monnify-webhook] marked invoice", invoice.id, "as Paid");
   }
 
   return new Response("OK", { status: 200 });

@@ -34,6 +34,11 @@ model Invoice {
   status             InvoiceStatus @default(PENDING)
   monnifyPaymentLink String?
   monnifyReference   String?       @unique
+  // References superseded by a silent link refresh (see notes-for-later-phases
+  // in AGENTS.md). Kept so a webhook for a link that was "stale enough to
+  // refresh" but still actually paid by the buyer before refreshing can
+  // still be matched back to this invoice instead of being silently dropped.
+  previousMonnifyReferences String[]  @default([])
   monnifyLinkGeneratedAt DateTime?
   createdAt          DateTime      @default(now())
   paidAt             DateTime?

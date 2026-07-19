@@ -57,6 +57,11 @@ export async function POST(
       monnifyPaymentLink: link.checkoutUrl,
       monnifyReference: link.paymentReference,
       monnifyLinkGeneratedAt: new Date(),
+      // Keep the superseded reference matchable — the buyer may complete
+      // payment on the old link in the moments before/during this refresh.
+      previousMonnifyReferences: invoice.monnifyReference
+        ? { push: invoice.monnifyReference }
+        : undefined,
     },
   });
 
