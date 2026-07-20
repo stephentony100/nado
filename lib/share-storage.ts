@@ -13,6 +13,7 @@ export interface ShareInvoice {
   total: number;
   monnifyPaymentLink: string | null;
   lineItems: ShareLineItem[];
+  sellerName: string;
 }
 
 export function saveShareInvoice(invoice: ShareInvoice) {

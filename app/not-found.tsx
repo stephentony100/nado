@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/logo-mark";
 
 export default function NotFound() {
   return (
     <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col items-center justify-center gap-3 bg-bg px-6 text-center">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink font-display text-lg font-bold text-accent">
-        k
+      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink">
+        <LogoMark size={22} />
       </span>
       <div className="font-display text-xl font-bold tracking-[-0.01em] text-text">
         We couldn't find that
@@ -17,7 +18,7 @@ export default function NotFound() {
         href="/"
         className="mt-2 rounded-xl bg-accent px-5 py-2.5 text-[14px] font-bold text-accent-ink shadow-[0_12px_24px_-10px_var(--accent)]"
       >
-        Back to Kobo
+        Back to Nado
       </Link>
     </div>
   );

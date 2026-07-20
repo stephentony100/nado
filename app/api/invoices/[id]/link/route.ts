@@ -15,7 +15,10 @@ export async function POST(
 ) {
   const { id } = await params;
 
-  const invoice = await prisma.invoice.findUnique({ where: { id } });
+  const invoice = await prisma.invoice.findUnique({
+    where: { id },
+    include: { seller: true },
+  });
   if (!invoice) {
     return Response.json({ error: "Invoice not found" }, { status: 404 });
   }
@@ -30,16 +33,16 @@ export async function POST(
   }
 
   const totalNaira = toNaira(invoice.total);
-  const paymentReference = `kobo-${crypto.randomUUID()}`;
+  const paymentReference = `nado-${crypto.randomUUID()}`;
 
   let link;
   try {
     link = await createPaymentLink({
       amountNaira: totalNaira,
       paymentReference,
-      paymentDescription: `Invoice from Mama Nkechi Stores — ${naira(totalNaira)}`,
-      customerName: "Kobo Buyer",
-      customerEmail: "buyer@kobo.ng",
+      paymentDescription: `Invoice from ${invoice.seller.name} — ${naira(totalNaira)}`,
+      customerName: "Nado Buyer",
+      customerEmail: "buyer@nado.app",
       invoiceId: id,
     });
   } catch (error) {

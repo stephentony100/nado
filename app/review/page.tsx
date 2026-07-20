@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { LogoMark } from "@/components/logo-mark";
 import { clearDraft, loadDraft, type DraftInvoice } from "@/lib/draft-storage";
 import { isDeliveryItem, naira } from "@/lib/invoice";
+import { getStoredSellerId } from "@/lib/seller-client";
 import { saveShareInvoice } from "@/lib/share-storage";
 
 interface ReviewItem {
@@ -43,9 +45,13 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!getStoredSellerId()) {
+      router.replace("/");
+      return;
+    }
     const d = loadDraft();
     if (!d || d.items.length === 0) {
-      router.replace("/");
+      router.replace("/chat");
       return;
     }
     setDraft(d);
@@ -93,6 +99,11 @@ export default function ReviewPage() {
 
   async function handleSave() {
     if (hasMissing || !draft || saving) return;
+    const sellerId = getStoredSellerId();
+    if (!sellerId) {
+      router.replace("/");
+      return;
+    }
     setSaving(true);
     setError(null);
 
@@ -101,6 +112,7 @@ export default function ReviewPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sellerId,
           rawInputText: draft.rawInputText,
           items: items.map((it) => ({
             name: it.name,
@@ -120,6 +132,7 @@ export default function ReviewPage() {
         total: data.invoice.total,
         monnifyPaymentLink: data.invoice.monnifyPaymentLink,
         lineItems: data.invoice.lineItems,
+        sellerName: data.sellerName,
       });
       router.push("/share");
     } catch (e) {
@@ -134,7 +147,7 @@ export default function ReviewPage() {
     <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
       <header className="flex items-center gap-3.5 border-b border-line px-4 py-2.5">
         <Link
-          href="/"
+          href="/chat"
           aria-label="Back"
           onClick={() => clearDraft()}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface"
@@ -151,8 +164,8 @@ export default function ReviewPage() {
 
       <div className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-4 pb-1.5 pt-4">
         <div className="flex items-start gap-2.5 rounded-xl bg-accent/[0.14] px-3.5 py-2.5">
-          <span className="mt-[1px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-accent font-display text-[11px] font-bold text-accent-ink">
-            k
+          <span className="mt-[1px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-accent">
+            <LogoMark size={11} />
           </span>
           <span className="text-[12.5px] leading-[1.45] text-text">
             {buildParseSummaryMessage(items.length, missingCount)}

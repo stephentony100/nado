@@ -13,7 +13,7 @@ export default async function ReceiptPage({
 
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
-    include: { lineItems: true },
+    include: { lineItems: true, seller: true },
   });
 
   if (!invoice || invoice.status !== "PAID") {
@@ -22,6 +22,7 @@ export default async function ReceiptPage({
 
   return (
     <ReceiptScreen
+      sellerName={invoice.seller.name}
       invoice={{
         id: invoice.id,
         total: invoice.total,

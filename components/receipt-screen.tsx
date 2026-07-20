@@ -8,12 +8,18 @@ import {
   triggerDownload,
 } from "@/lib/document-export";
 
-export function ReceiptScreen({ invoice }: { invoice: DocumentData }) {
+export function ReceiptScreen({
+  invoice,
+  sellerName,
+}: {
+  invoice: DocumentData;
+  sellerName: string;
+}) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState<"download" | "share" | null>(null);
 
   const invoiceCode = invoice.id.slice(-6).toUpperCase();
-  const filename = `kobo-receipt-${invoiceCode}.png`;
+  const filename = `nado-receipt-${invoiceCode}.png`;
 
   async function handleDownload() {
     if (!cardRef.current || busy) return;
@@ -31,7 +37,7 @@ export function ReceiptScreen({ invoice }: { invoice: DocumentData }) {
     setBusy("share");
     try {
       const file = await renderNodeToPngFile(cardRef.current, filename);
-      await shareOrDownloadFile(file, { title: `Kobo receipt #${invoiceCode}` });
+      await shareOrDownloadFile(file, { title: `Nado receipt #${invoiceCode}` });
     } finally {
       setBusy(null);
     }
@@ -39,7 +45,7 @@ export function ReceiptScreen({ invoice }: { invoice: DocumentData }) {
 
   return (
     <div className="mx-auto flex w-full max-w-[420px] flex-col gap-4 px-4 py-8">
-      <DocumentCard ref={cardRef} invoice={invoice} paid />
+      <DocumentCard ref={cardRef} invoice={invoice} paid sellerName={sellerName} />
 
       <div className="flex gap-2.5">
         <button

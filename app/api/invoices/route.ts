@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { getSeedSellerId } from "@/lib/seed-seller";
 import { naira, toKobo } from "@/lib/invoice";
 import { createPaymentLink } from "@/lib/monnify";
 
@@ -13,9 +12,13 @@ interface InvoiceItemInput {
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
+  const sellerId = body?.sellerId;
   const rawInputText = body?.rawInputText;
   const items: InvoiceItemInput[] | undefined = body?.items;
 
+  if (typeof sellerId !== "string" || !sellerId) {
+    return Response.json({ error: "Missing sellerId" }, { status: 400 });
+  }
   if (typeof rawInputText !== "string" || !rawInputText.trim()) {
     return Response.json({ error: "Missing rawInputText" }, { status: 400 });
   }
@@ -29,7 +32,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const sellerId = await getSeedSellerId();
+  const seller = await prisma.seller.findUnique({ where: { id: sellerId } });
+  if (!seller) {
+    return Response.json({ error: "Seller not found" }, { status: 404 });
+  }
+
   const total = items.reduce(
     (sum, it) => sum + it.quantity * (it.unitPrice as number),
     0
@@ -58,14 +65,14 @@ export async function POST(request: Request) {
     include: { lineItems: true },
   });
 
-  const paymentReference = `kobo-${crypto.randomUUID()}`;
+  const paymentReference = `nado-${crypto.randomUUID()}`;
   try {
     const link = await createPaymentLink({
       amountNaira: total,
       paymentReference,
-      paymentDescription: `Invoice from Mama Nkechi Stores — ${naira(total)}`,
-      customerName: "Kobo Buyer",
-      customerEmail: "buyer@kobo.ng",
+      paymentDescription: `Invoice from ${seller.name} — ${naira(total)}`,
+      customerName: "Nado Buyer",
+      customerEmail: "buyer@nado.app",
       invoiceId: invoice.id,
     });
 
@@ -79,13 +86,13 @@ export async function POST(request: Request) {
       include: { lineItems: true },
     });
 
-    return Response.json({ ok: true, invoice: updated });
+    return Response.json({ ok: true, invoice: updated, sellerName: seller.name });
   } catch (error) {
     // The seller's work (the invoice + line items) is never lost, even if
     // Monnify is unreachable — the row stays with monnifyPaymentLink null
     // and the share screen offers a retry via /api/invoices/[id]/link,
     // which already knows how to generate a link from scratch.
     console.error("[invoices] payment link generation failed:", error);
-    return Response.json({ ok: true, invoice });
+    return Response.json({ ok: true, invoice, sellerName: seller.name });
   }
 }

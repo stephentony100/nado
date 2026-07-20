@@ -1,31 +1,43 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/logo-mark";
 
-const SELLER_NAME = "Mama Nkechi Stores";
+function initialsFor(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
 
-export function AppHeader({ active }: { active: "chat" | "dashboard" }) {
-  const title = active === "chat" ? "Kobo" : "Dashboard";
+export function AppHeader({
+  active,
+  sellerName,
+}: {
+  active: "chat" | "dashboard";
+  sellerName: string;
+}) {
+  const title = active === "chat" ? "Nado" : "Dashboard";
 
   return (
     <header className="border-b border-line px-5 pt-3.5">
       <div className="mb-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink font-display text-lg font-bold text-accent">
-            k
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink">
+            <LogoMark size={22} />
           </span>
           <div className="flex flex-col leading-tight">
             <span className="font-display text-[17px] font-bold tracking-[-0.01em] text-text">
               {title}
             </span>
-            <span className="text-[12px] text-muted">{SELLER_NAME}</span>
+            <span className="text-[12px] text-muted">{sellerName}</span>
           </div>
         </div>
         <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-surface font-display text-[13px] font-bold text-accent">
-          MN
+          {initialsFor(sellerName)}
         </span>
       </div>
       <nav className="flex items-center gap-[22px]">
         <Link
-          href="/"
+          href="/chat"
           className={`flex flex-col gap-2 pb-2.5 text-[14px] ${
             active === "chat" ? "font-bold text-text" : "font-semibold text-muted"
           }`}

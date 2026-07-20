@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { DocumentCard, type DocumentData } from "@/components/document-card";
 import { renderNodeToPngFile, triggerDownload } from "@/lib/document-export";
 
-const SELLER_NAME = "Mama Nkechi Stores";
-
 // The webhook can take a moment to land after the buyer is redirected back
 // here, so poll quickly at first (covers the common case where it already
 // landed) then fall back to a slower background poll rather than leaving
@@ -14,7 +12,13 @@ const FAST_POLL_MS = 1500;
 const FAST_POLL_ATTEMPTS = 5;
 const SLOW_POLL_MS = 5000;
 
-export function PaidScreen({ invoice: initialInvoice }: { invoice: DocumentData & { status: string } }) {
+export function PaidScreen({
+  invoice: initialInvoice,
+  sellerName,
+}: {
+  invoice: DocumentData & { status: string };
+  sellerName: string;
+}) {
   const [invoice, setInvoice] = useState(initialInvoice);
   const [waiting, setWaiting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -61,7 +65,7 @@ export function PaidScreen({ invoice: initialInvoice }: { invoice: DocumentData 
       const invoiceCode = invoice.id.slice(-6).toUpperCase();
       const file = await renderNodeToPngFile(
         cardRef.current,
-        `kobo-receipt-${invoiceCode}.png`
+        `nado-receipt-${invoiceCode}.png`
       );
       triggerDownload(file);
     } finally {
@@ -96,13 +100,13 @@ export function PaidScreen({ invoice: initialInvoice }: { invoice: DocumentData 
             Payment successful
           </div>
           <div className="mt-[3px] text-[13.5px] text-white/60">
-            You paid {SELLER_NAME}
+            You paid {sellerName}
           </div>
         </div>
       </div>
 
       <div className="w-full flex-shrink-0">
-        <DocumentCard ref={cardRef} invoice={invoice} paid />
+        <DocumentCard ref={cardRef} invoice={invoice} paid sellerName={sellerName} />
       </div>
 
       <button
@@ -114,7 +118,7 @@ export function PaidScreen({ invoice: initialInvoice }: { invoice: DocumentData 
         {downloading ? "Preparing…" : "Download receipt"}
       </button>
       <span className="max-w-[30ch] text-center text-[11.5px] text-white/50">
-        Your copy — save it even without a Kobo account.
+        Your copy — save it even without a Nado account.
       </span>
     </div>
   );

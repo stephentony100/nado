@@ -21,7 +21,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kobo",
+  title: "Nado",
   description: "Turn a chat message into a paid invoice.",
 };
 

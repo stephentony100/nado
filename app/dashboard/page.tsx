@@ -1,15 +1,21 @@
+import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { InvoiceCard, type InvoiceCardData } from "@/components/invoice-card";
 import { naira, toNaira } from "@/lib/invoice";
 import { prisma } from "@/lib/prisma";
-import { getSeedSellerId } from "@/lib/seed-seller";
+import { getSellerIdFromCookie } from "@/lib/seller-server";
 
 // Same reasoning as the chat feed: this reads real DB totals on every
 // request, so it must never be statically prerendered.
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const sellerId = await getSeedSellerId();
+  const sellerId = await getSellerIdFromCookie();
+  if (!sellerId) redirect("/");
+
+  const seller = await prisma.seller.findUnique({ where: { id: sellerId } });
+  if (!seller) redirect("/");
+
   const invoices = await prisma.invoice.findMany({
     where: { sellerId },
     include: { lineItems: true },
@@ -31,7 +37,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
-      <AppHeader active="dashboard" />
+      <AppHeader active="dashboard" sellerName={seller.name} />
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6 pt-4">
         <div className="flex flex-col gap-2.5">
@@ -89,7 +95,11 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col gap-4">
             {invoices.map((invoice) => (
-              <InvoiceCard key={invoice.id} invoice={invoice as InvoiceCardData} />
+              <InvoiceCard
+                key={invoice.id}
+                invoice={invoice as InvoiceCardData}
+                sellerName={seller.name}
+              />
             ))}
           </div>
         )}

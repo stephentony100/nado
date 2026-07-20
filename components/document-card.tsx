@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { LogoMark } from "@/components/logo-mark";
 import {
   formatDateLong,
   formatTimeAmPm,
@@ -6,8 +7,6 @@ import {
   naira,
   toNaira,
 } from "@/lib/invoice";
-
-const SELLER_NAME = "Mama Nkechi Stores";
 
 export interface DocumentLineItem {
   name: string;
@@ -28,13 +27,14 @@ export interface DocumentData {
 interface DocumentCardProps {
   invoice: DocumentData;
   paid: boolean;
+  sellerName: string;
 }
 
 // The single source of truth for the invoice/receipt document image —
 // unpaid (4A) and paid (3B/4B) are the same artifact with a few bits
 // toggled, not two separate renderers.
 export const DocumentCard = forwardRef<HTMLDivElement, DocumentCardProps>(
-  function DocumentCard({ invoice, paid }, ref) {
+  function DocumentCard({ invoice, paid, sellerName }, ref) {
     const invoiceCode = invoice.id.slice(-6).toUpperCase();
     const paidAt = invoice.paidAt ? new Date(invoice.paidAt) : new Date();
     const issuedAt = new Date(invoice.createdAt);
@@ -59,12 +59,12 @@ export const DocumentCard = forwardRef<HTMLDivElement, DocumentCardProps>(
       >
         <div className="flex items-center justify-between bg-ink px-6 py-[22px]">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface font-display text-xl font-bold text-accent">
-              k
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface">
+              <LogoMark size={24} />
             </span>
             <div className="flex flex-col leading-tight">
               <span className="font-display text-xl font-bold tracking-[-0.01em] text-white">
-                Kobo
+                Nado
               </span>
               <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-accent">
                 {paid ? "Receipt" : "Invoice"}
@@ -87,7 +87,7 @@ export const DocumentCard = forwardRef<HTMLDivElement, DocumentCardProps>(
           )}
 
           <div className="font-display text-[22px] font-bold tracking-[-0.01em] text-text">
-            {SELLER_NAME}
+            {sellerName}
           </div>
           <div className="mt-1 font-mono text-[11px] text-muted">
             Issued {formatDateLong(issuedAt)} · {formatTimeAmPm(issuedAt)}
@@ -146,7 +146,7 @@ export const DocumentCard = forwardRef<HTMLDivElement, DocumentCardProps>(
 
         <div className="flex items-center justify-between border-t border-line bg-bg px-6 py-3.5">
           <span className="font-mono text-[10.5px] tracking-[0.06em] text-muted">
-            Sent via Kobo · kobo.ng
+            Sent via Nado · nado.app
           </span>
           {paid && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-paid-bg px-2.5 py-1 text-[11px] font-bold text-paid">

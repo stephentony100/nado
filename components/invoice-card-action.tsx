@@ -63,7 +63,13 @@ export function ViewReceiptAction({ invoiceId }: { invoiceId: string }) {
 // already paid for. The stamped document is only ever reachable via
 // "View receipt" on Paid cards. Renders the exportable document off-screen
 // so it never appears in the feed itself.
-export function DownloadDocumentAction({ invoice }: { invoice: DocumentData }) {
+export function DownloadDocumentAction({
+  invoice,
+  sellerName,
+}: {
+  invoice: DocumentData;
+  sellerName: string;
+}) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -72,9 +78,9 @@ export function DownloadDocumentAction({ invoice }: { invoice: DocumentData }) {
     setBusy(true);
     try {
       const invoiceCode = invoice.id.slice(-6).toUpperCase();
-      const filename = `kobo-invoice-${invoiceCode}.png`;
+      const filename = `nado-invoice-${invoiceCode}.png`;
       const file = await renderNodeToPngFile(cardRef.current, filename);
-      await shareOrDownloadFile(file, { title: `Kobo invoice #${invoiceCode}` });
+      await shareOrDownloadFile(file, { title: `Nado invoice #${invoiceCode}` });
     } finally {
       setBusy(false);
     }
@@ -92,7 +98,7 @@ export function DownloadDocumentAction({ invoice }: { invoice: DocumentData }) {
         {busy ? "Preparing…" : "Invoice"}
       </button>
       <div className="pointer-events-none fixed left-[-9999px] top-0">
-        <DocumentCard ref={cardRef} invoice={invoice} paid={false} />
+        <DocumentCard ref={cardRef} invoice={invoice} paid={false} sellerName={sellerName} />
       </div>
     </>
   );

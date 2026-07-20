@@ -3,6 +3,7 @@
 :root {
   --ink: #0e1526;
   --surface: #17213b;
+  --surface2: #213052;
   --accent: #f2b33d;
   --accent-ink: #231703;
   --bg: #fbf7ee;
@@ -20,6 +21,7 @@
 @theme inline {
   --color-ink: var(--ink);
   --color-surface: var(--surface);
+  --color-surface2: var(--surface2);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-bg: var(--bg);

@@ -74,7 +74,13 @@ function ItemRow({ item }: { item: InvoiceCardLineItem }) {
   );
 }
 
-export function InvoiceCard({ invoice }: { invoice: InvoiceCardData }) {
+export function InvoiceCard({
+  invoice,
+  sellerName,
+}: {
+  invoice: InvoiceCardData;
+  sellerName: string;
+}) {
   const style = statusStyles[invoice.status];
 
   return (
@@ -113,6 +119,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceCardData }) {
               paidAt: invoice.paidAt ? invoice.paidAt.toISOString() : null,
               lineItems: invoice.lineItems,
             }}
+            sellerName={sellerName}
           />
           {invoice.status === "PENDING" && <CopyLinkAction invoiceId={invoice.id} />}
           {invoice.status === "PAID" && <ViewReceiptAction invoiceId={invoice.id} />}

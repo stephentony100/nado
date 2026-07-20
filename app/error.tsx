@@ -37,7 +37,7 @@ export default function ErrorPage({
           href="/"
           className="rounded-xl border-[1.5px] border-ink px-5 py-2.5 text-[14px] font-bold text-ink"
         >
-          Back to Kobo
+          Back to Nado
         </Link>
       </div>
     </div>

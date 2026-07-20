@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LogoMark } from "@/components/logo-mark";
 import {
   clearShareInvoice,
   loadShareInvoice,
@@ -11,10 +12,8 @@ import {
 } from "@/lib/share-storage";
 import { isDeliveryItem, naira, toNaira } from "@/lib/invoice";
 
-const SELLER_NAME = "Mama Nkechi Stores";
-
-function buildWhatsAppMessage(total: number, link: string): string {
-  return `Hi! Here's your invoice from ${SELLER_NAME} — ${naira(total)}. Pay here: ${link}`;
+function buildWhatsAppMessage(sellerName: string, total: number, link: string): string {
+  return `Hi! Here's your invoice from ${sellerName} — ${naira(total)}. Pay here: ${link}`;
 }
 
 export default function SharePage() {
@@ -48,7 +47,7 @@ export default function SharePage() {
 
   function handleWhatsAppShare() {
     if (!invoice?.monnifyPaymentLink) return;
-    const message = buildWhatsAppMessage(totalNaira, invoice.monnifyPaymentLink);
+    const message = buildWhatsAppMessage(invoice.sellerName, totalNaira, invoice.monnifyPaymentLink);
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
   }
 
@@ -72,17 +71,17 @@ export default function SharePage() {
     }
   }
 
-  function handleBackToKobo() {
+  function handleBackToNado() {
     clearShareInvoice();
-    router.push("/");
+    router.push("/chat");
   }
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
       <header className="flex items-center gap-3.5 border-b border-line px-4 py-2.5">
         <Link
-          href="/"
-          aria-label="Back to Kobo"
+          href="/chat"
+          aria-label="Back to Nado"
           onClick={() => clearShareInvoice()}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface"
         >
@@ -184,8 +183,8 @@ export default function SharePage() {
           </span>
           {linkReady ? (
             <div className="flex items-center gap-2.5 rounded-xl border-[1.5px] border-line bg-white px-[15px] py-3.5">
-              <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-surface font-display text-sm font-bold text-accent">
-                k
+              <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-surface">
+                <LogoMark size={18} />
               </span>
               <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[13.5px] text-text">
                 {invoice.monnifyPaymentLink}
@@ -230,10 +229,10 @@ export default function SharePage() {
         </button>
         <button
           type="button"
-          onClick={handleBackToKobo}
+          onClick={handleBackToNado}
           className="flex items-center justify-center py-1.5 text-[14px] font-bold text-muted"
         >
-          Back to Kobo
+          Back to Nado
         </button>
       </div>
     </div>

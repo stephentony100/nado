@@ -1,0 +1,96 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { LogoMark } from "@/components/logo-mark";
+import { setStoredSellerId } from "@/lib/seller-client";
+
+export default function OnboardingPage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    const trimmed = name.trim();
+    if (!trimmed || submitting) return;
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/sellers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, phone: phone.trim() }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.seller?.id) {
+        throw new Error(data?.error ?? "Couldn't create your store — try again.");
+      }
+      setStoredSellerId(data.seller.id);
+      router.push("/chat");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't create your store — try again.");
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-bg px-[26px] py-[30px]">
+      <span className="mb-6 flex h-[58px] w-[58px] items-center justify-center rounded-2xl bg-ink">
+        <LogoMark size={36} />
+      </span>
+      <h1 className="mb-2 font-display text-[27px] font-bold leading-[1.1] tracking-[-0.02em] text-text">
+        Let&apos;s set up your store
+      </h1>
+      <p className="mb-7 text-[14px] leading-[1.5] text-muted">
+        This is the name your buyers see on invoices and receipts. You can
+        change it anytime.
+      </p>
+
+      <div className="flex flex-col gap-[18px]">
+        <div className="flex flex-col gap-[7px]">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-text">
+            Store name <span className="text-pending">*</span>
+          </span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Mama Nkechi Stores"
+            className="rounded-xl border-[1.5px] border-accent bg-white px-[15px] py-3.5 text-[15px] font-semibold text-text shadow-[0_0_0_4px_rgba(242,179,61,0.16)] outline-none placeholder:font-normal placeholder:text-muted"
+          />
+        </div>
+        <div className="flex flex-col gap-[7px]">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
+            Phone number <span className="font-sans text-[12px] font-normal normal-case tracking-normal">· optional</span>
+          </span>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+234 801 234 5678"
+            className="rounded-xl border-[1.5px] border-line bg-bg px-[15px] py-3.5 text-[15px] text-text outline-none placeholder:text-muted"
+          />
+          <span className="text-[11.5px] text-muted">
+            For payment alerts and account recovery.
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-col gap-3 pt-[30px]">
+        {error && <div className="text-[12px] text-over">{error}</div>}
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!name.trim() || submitting}
+          className="flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-4 text-[15.5px] font-bold text-accent-ink shadow-[0_14px_26px_-10px_var(--accent)] disabled:opacity-60"
+        >
+          {submitting ? "Setting up…" : "Start using Nado →"}
+        </button>
+        <span className="text-center text-[11.5px] text-muted">
+          No card, no setup fee — just start sending invoices.
+        </span>
+      </div>
+    </div>
+  );
+}
