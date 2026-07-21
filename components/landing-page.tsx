@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { AppShell } from "@/components/app-shell";
 import { LogoMark } from "@/components/logo-mark";
 
 export function LandingPage() {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-bg">
+    <AppShell>
+    <div className="flex h-full w-full flex-col bg-bg">
       <header className="flex items-center justify-between px-5 py-3">
         <div className="flex items-center gap-2.5">
           <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-ink">
@@ -21,7 +23,7 @@ export function LandingPage() {
         </Link>
       </header>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-y-auto">
         <div className="px-6 pb-[30px] pt-6">
           <span className="mb-[18px] inline-flex items-center gap-1.5 rounded-full bg-accent/[0.16] px-2.5 py-1 font-mono text-[10.5px] font-bold tracking-[0.04em] text-pending">
             For traders &amp; home businesses
@@ -128,5 +130,6 @@ export function LandingPage() {
         </div>
       </div>
     </div>
+    </AppShell>
   );
 }

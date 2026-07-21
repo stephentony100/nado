@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { AppShell } from "@/components/app-shell";
 import { InvoiceCard, type InvoiceCardData } from "@/components/invoice-card";
 import { naira, toNaira } from "@/lib/invoice";
 import { prisma } from "@/lib/prisma";
@@ -36,12 +37,13 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
-      <AppHeader active="dashboard" sellerName={seller.name} />
+    <AppShell wide>
+      <div className="flex h-full w-full flex-col bg-bg">
+        <AppHeader active="dashboard" sellerName={seller.name} />
 
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6 pt-4">
-        <div className="flex flex-col gap-2.5">
-          <div className="flex flex-col gap-1 rounded-[18px] bg-ink px-[18px] py-4 pb-[18px]">
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6 pt-4 sm:px-8 sm:pt-6">
+        <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-3 sm:gap-4">
+          <div className="flex flex-col gap-1 rounded-[18px] bg-ink px-[18px] py-4 pb-[18px] sm:col-span-1 sm:justify-center sm:px-7 sm:py-6">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-white/55">
                 Total sales
@@ -55,8 +57,8 @@ export default async function DashboardPage() {
               {naira(toNaira(totalSales))}
             </span>
           </div>
-          <div className="flex gap-2.5">
-            <div className="flex flex-1 flex-col gap-1.5 rounded-[18px] border border-line bg-white p-[15px] shadow-[0_14px_30px_-22px_rgba(14,21,38,0.4)]">
+          <div className="flex gap-2.5 sm:contents">
+            <div className="flex flex-1 flex-col gap-1.5 rounded-[18px] border border-line bg-white p-[15px] shadow-[0_14px_30px_-22px_rgba(14,21,38,0.4)] sm:justify-center sm:p-6">
               <span className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
                 Pending
               </span>
@@ -67,7 +69,7 @@ export default async function DashboardPage() {
                 {pendingCount} unpaid
               </span>
             </div>
-            <div className="flex flex-1 flex-col gap-1.5 rounded-[18px] border border-line bg-white p-[15px] shadow-[0_14px_30px_-22px_rgba(14,21,38,0.4)]">
+            <div className="flex flex-1 flex-col gap-1.5 rounded-[18px] border border-line bg-white p-[15px] shadow-[0_14px_30px_-22px_rgba(14,21,38,0.4)] sm:justify-center sm:p-6">
               <span className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
                 Invoices
               </span>
@@ -93,7 +95,7 @@ export default async function DashboardPage() {
             No invoices yet
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:items-start sm:gap-5">
             {invoices.map((invoice) => (
               <InvoiceCard
                 key={invoice.id}
@@ -103,7 +105,8 @@ export default async function DashboardPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

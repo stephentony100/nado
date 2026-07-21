@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { AppShell } from "@/components/app-shell";
 import { ChatComposer } from "@/components/chat-composer";
 import { InvoiceCard, type InvoiceCardData } from "@/components/invoice-card";
 import { formatTime } from "@/lib/invoice";
@@ -41,33 +42,35 @@ export default async function ChatPage() {
   });
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
-      <AppHeader active="chat" sellerName={seller.name} />
+    <AppShell>
+      <div className="flex h-full w-full flex-col bg-bg">
+        <AppHeader active="chat" sellerName={seller.name} />
 
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-2 pt-4">
-        {invoices.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center px-6 text-center text-[13px] text-muted">
-            No invoices yet — type your first order below.
-          </div>
-        ) : (
-          <>
-            <div className="self-center rounded-full bg-ink/[0.06] px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
-              Today
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-2 pt-4">
+          {invoices.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center px-6 text-center text-[13px] text-muted">
+              No invoices yet — type your first order below.
             </div>
-            {invoices.map((invoice) => (
-              <Fragment key={invoice.id}>
-                <SellerMessage
-                  text={invoice.rawInputText}
-                  time={formatTime(invoice.createdAt)}
-                />
-                <InvoiceCard invoice={invoice as FeedInvoice} sellerName={seller.name} />
-              </Fragment>
-            ))}
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <div className="self-center rounded-full bg-ink/[0.06] px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
+                Today
+              </div>
+              {invoices.map((invoice) => (
+                <Fragment key={invoice.id}>
+                  <SellerMessage
+                    text={invoice.rawInputText}
+                    time={formatTime(invoice.createdAt)}
+                  />
+                  <InvoiceCard invoice={invoice as FeedInvoice} sellerName={seller.name} />
+                </Fragment>
+              ))}
+            </>
+          )}
+        </div>
 
-      <ChatComposer />
-    </div>
+        <ChatComposer />
+      </div>
+    </AppShell>
   );
 }

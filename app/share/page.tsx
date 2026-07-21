@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AppShell } from "@/components/app-shell";
 import { LogoMark } from "@/components/logo-mark";
 import {
   clearShareInvoice,
@@ -77,7 +78,8 @@ export default function SharePage() {
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
+    <AppShell>
+    <div className="flex h-full w-full flex-col bg-bg">
       <header className="flex items-center gap-3.5 border-b border-line px-4 py-2.5">
         <Link
           href="/chat"
@@ -236,5 +238,6 @@ export default function SharePage() {
         </button>
       </div>
     </div>
+    </AppShell>
   );
 }

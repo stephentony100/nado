@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { AppShell } from "@/components/app-shell";
 import { DocumentCard, type DocumentData } from "@/components/document-card";
 import { renderAndDownload } from "@/lib/document-export";
 
@@ -71,22 +72,25 @@ export function PaidScreen({
 
   if (invoice.status !== "PAID") {
     return (
-      <div className="mx-auto flex h-dvh w-full max-w-[420px] flex-col items-center justify-center gap-3 bg-ink px-6 text-center">
-        <span className="h-11 w-11 animate-spin rounded-full border-[3px] border-white/20 border-t-accent" />
-        <div className="font-display text-lg font-bold text-white">
-          {waiting ? "Still confirming your payment…" : "Confirming your payment…"}
+      <AppShell>
+        <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-ink px-6 text-center">
+          <span className="h-11 w-11 animate-spin rounded-full border-[3px] border-white/20 border-t-accent" />
+          <div className="font-display text-lg font-bold text-white">
+            {waiting ? "Still confirming your payment…" : "Confirming your payment…"}
+          </div>
+          <p className="max-w-[280px] text-[13px] text-white/60">
+            {waiting
+              ? "This can take a little longer than usual — this page will update as soon as it lands."
+              : "Just a moment while we hear back from your bank."}
+          </p>
         </div>
-        <p className="max-w-[280px] text-[13px] text-white/60">
-          {waiting
-            ? "This can take a little longer than usual — this page will update as soon as it lands."
-            : "Just a moment while we hear back from your bank."}
-        </p>
-      </div>
+      </AppShell>
     );
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[420px] flex-col items-center gap-[18px] bg-ink px-5 py-7">
+    <AppShell>
+    <div className="flex h-full w-full flex-col items-center gap-[18px] overflow-y-auto bg-ink px-5 py-7">
       <div className="flex flex-col items-center gap-3 pt-1.5">
         <span className="flex h-[66px] w-[66px] items-center justify-center rounded-full bg-paid shadow-[0_14px_30px_-10px_var(--paid)]">
           <span className="mt-[-5px] block h-3 w-[22px] -rotate-45 border-b-[3.5px] border-l-[3.5px] border-white" />
@@ -117,5 +121,6 @@ export function PaidScreen({
         Your copy — save it even without a Nado account.
       </span>
     </div>
+    </AppShell>
   );
 }

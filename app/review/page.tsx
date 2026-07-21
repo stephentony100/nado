@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { AppShell } from "@/components/app-shell";
 import { LogoMark } from "@/components/logo-mark";
 import { clearDraft, loadDraft, type DraftInvoice } from "@/lib/draft-storage";
 import { isDeliveryItem, naira } from "@/lib/invoice";
@@ -145,7 +146,8 @@ export default function ReviewPage() {
   if (!draft) return null;
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-[480px] flex-col bg-bg">
+    <AppShell>
+    <div className="flex h-full w-full flex-col bg-bg">
       <header className="flex items-center gap-3.5 border-b border-line px-4 py-2.5">
         <Link
           href="/chat"
@@ -298,5 +300,6 @@ export default function ReviewPage() {
         )}
       </div>
     </div>
+    </AppShell>
   );
 }
