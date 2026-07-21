@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/app-header";
 import { AppShell } from "@/components/app-shell";
 import { ChatComposer } from "@/components/chat-composer";
 import { InvoiceCard, type InvoiceCardData } from "@/components/invoice-card";
+import { OnboardingTour } from "@/components/onboarding-tour";
 import { formatTime } from "@/lib/invoice";
 import { prisma } from "@/lib/prisma";
 import { getSellerIdFromCookie } from "@/lib/seller-server";
@@ -71,6 +72,7 @@ export default async function ChatPage() {
 
         <ChatComposer />
       </div>
+      <OnboardingTour />
     </AppShell>
   );
 }

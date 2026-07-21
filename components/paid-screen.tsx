@@ -72,7 +72,7 @@ export function PaidScreen({
 
   if (invoice.status !== "PAID") {
     return (
-      <AppShell>
+      <AppShell tone="dark">
         <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-ink px-6 text-center">
           <span className="h-11 w-11 animate-spin rounded-full border-[3px] border-white/20 border-t-accent" />
           <div className="font-display text-lg font-bold text-white">
@@ -89,7 +89,7 @@ export function PaidScreen({
   }
 
   return (
-    <AppShell>
+    <AppShell tone="dark">
     <div className="flex h-full w-full flex-col items-center gap-[18px] overflow-y-auto bg-ink px-5 py-7">
       <div className="flex flex-col items-center gap-3 pt-1.5">
         <span className="flex h-[66px] w-[66px] items-center justify-center rounded-full bg-paid shadow-[0_14px_30px_-10px_var(--paid)]">

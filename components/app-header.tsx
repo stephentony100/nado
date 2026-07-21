@@ -1,12 +1,6 @@
 import Link from "next/link";
+import { AvatarMenu } from "@/components/avatar-menu";
 import { LogoMark } from "@/components/logo-mark";
-
-function initialsFor(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
 
 export function AppHeader({
   active,
@@ -31,9 +25,7 @@ export function AppHeader({
             <span className="text-[12px] text-muted">{sellerName}</span>
           </div>
         </div>
-        <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-surface font-display text-[13px] font-bold text-accent">
-          {initialsFor(sellerName)}
-        </span>
+        <AvatarMenu sellerName={sellerName} />
       </div>
       <nav className="flex items-center gap-[22px]">
         <Link

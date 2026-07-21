@@ -30,6 +30,7 @@ export default function OnboardingPage() {
         throw new Error(data?.error ?? "Couldn't create your store — try again.");
       }
       setStoredSellerId(data.seller.id);
+      localStorage.setItem("nado_tour_pending", "1");
       router.push("/chat");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't create your store — try again.");
