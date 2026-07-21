@@ -20,7 +20,7 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://oja-invoice.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://usenado.vercel.app";
 const TAGLINE = "Type it. Send it. Get paid.";
 const DESCRIPTION =
   "Write an order the way you already text your customers. Nado turns it into a proper invoice, a Monnify payment link, and a receipt, with your sales tracked as you go.";

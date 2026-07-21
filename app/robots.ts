@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://oja-invoice.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://usenado.vercel.app";
 
 // Only the marketing/onboarding pages are meant for crawlers — everything
 // past onboarding is per-seller session state or a buyer-facing payment/

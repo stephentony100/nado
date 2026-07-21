@@ -7,7 +7,7 @@ into a proper invoice, a Monnify payment link, and a receipt, with your
 sales tracked as you go. Built for the APIConf Lagos x Monnify Developer
 Challenge.
 
-Live: https://oja-invoice.vercel.app
+Live: https://usenado.vercel.app
 
 ## Setup
 
