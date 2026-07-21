@@ -100,3 +100,15 @@ didn't catch. DO NOT rely on "Invoice" working during the live demo —
 use "View receipt" (Paid) or "Copy payment link" (Pending) instead,
 both of which are confirmed working. Revisit this after submission if
 time allows.
+
+- Monnify sandbox's Transfer payment method can intermittently fail with
+  a generic "Transaction Failed" error unrelated to our code. If this
+  happens during the live demo, switch to Card payment instead of
+  troubleshooting on stage.
+- Known limitation, accepted for submission: the seller session cookie is
+  client-set and unsigned. The IDOR vector where a seller passes another
+  seller's id directly is closed (server derives sellerId from session,
+  not client input), but a determined attacker who already knows another
+  seller's exact session value could still set it manually. Proper fix is
+  a signed/HttpOnly server-issued session — real follow-up work, out of
+  scope for this submission's remaining time.

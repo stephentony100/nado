@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { DocumentCard, type DocumentData } from "@/components/document-card";
-import { renderNodeToPngFile, triggerDownload } from "@/lib/document-export";
+import { renderAndDownload } from "@/lib/document-export";
 
 // The webhook can take a moment to land after the buyer is redirected back
 // here, so poll quickly at first (covers the common case where it already
@@ -63,11 +63,7 @@ export function PaidScreen({
     setDownloading(true);
     try {
       const invoiceCode = invoice.id.slice(-6).toUpperCase();
-      const file = await renderNodeToPngFile(
-        cardRef.current,
-        `nado-receipt-${invoiceCode}.png`
-      );
-      triggerDownload(file);
+      await renderAndDownload(cardRef.current, `nado-receipt-${invoiceCode}.png`);
     } finally {
       setDownloading(false);
     }

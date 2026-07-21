@@ -2,11 +2,7 @@
 
 import { useRef, useState } from "react";
 import { DocumentCard, type DocumentData } from "@/components/document-card";
-import {
-  renderNodeToPngFile,
-  shareOrDownloadFile,
-  triggerDownload,
-} from "@/lib/document-export";
+import { renderAndDownload, renderAndShare } from "@/lib/document-export";
 
 export function ReceiptScreen({
   invoice,
@@ -25,8 +21,7 @@ export function ReceiptScreen({
     if (!cardRef.current || busy) return;
     setBusy("download");
     try {
-      const file = await renderNodeToPngFile(cardRef.current, filename);
-      triggerDownload(file);
+      await renderAndDownload(cardRef.current, filename);
     } finally {
       setBusy(null);
     }
@@ -36,8 +31,7 @@ export function ReceiptScreen({
     if (!cardRef.current || busy) return;
     setBusy("share");
     try {
-      const file = await renderNodeToPngFile(cardRef.current, filename);
-      await shareOrDownloadFile(file, { title: `Nado receipt #${invoiceCode}` });
+      await renderAndShare(cardRef.current, filename, `Nado receipt #${invoiceCode}`);
     } finally {
       setBusy(null);
     }

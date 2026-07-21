@@ -46,6 +46,8 @@ export interface InvoiceCardData {
   createdAt: Date;
   paidAt: Date | null;
   lineItems: InvoiceCardLineItem[];
+  monnifyPaymentLink: string | null;
+  monnifyLinkGeneratedAt: Date | null;
 }
 
 function ItemRow({ item }: { item: InvoiceCardLineItem }) {
@@ -121,7 +123,17 @@ export function InvoiceCard({
             }}
             sellerName={sellerName}
           />
-          {invoice.status === "PENDING" && <CopyLinkAction invoiceId={invoice.id} />}
+          {invoice.status === "PENDING" && (
+            <CopyLinkAction
+              invoiceId={invoice.id}
+              link={invoice.monnifyPaymentLink}
+              linkGeneratedAt={
+                invoice.monnifyLinkGeneratedAt
+                  ? invoice.monnifyLinkGeneratedAt.toISOString()
+                  : null
+              }
+            />
+          )}
           {invoice.status === "PAID" && <ViewReceiptAction invoiceId={invoice.id} />}
         </div>
       </div>

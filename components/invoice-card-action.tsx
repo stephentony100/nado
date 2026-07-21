@@ -3,15 +3,72 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { DocumentCard, type DocumentData } from "@/components/document-card";
-import { renderNodeToPngFile, shareOrDownloadFile } from "@/lib/document-export";
+import { renderAndShare } from "@/lib/document-export";
 
-export function CopyLinkAction({ invoiceId }: { invoiceId: string }) {
+// Must match LINK_MAX_AGE_MS in app/api/invoices/[id]/link/route.ts — kept
+// in sync manually since this is the client-side mirror of that check.
+const LINK_MAX_AGE_MS = 30 * 60 * 1000;
+
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function CopyLinkAction({
+  invoiceId,
+  link,
+  linkGeneratedAt,
+}: {
+  invoiceId: string;
+  link: string | null;
+  linkGeneratedAt: string | null;
+}) {
   const [state, setState] = useState<"idle" | "copying" | "copied" | "error">(
     "idle"
   );
+  const [manualLink, setManualLink] = useState<string | null>(null);
+  const manualInputRef = useRef<HTMLInputElement>(null);
+
+  const isStale =
+    !link ||
+    !linkGeneratedAt ||
+    Date.now() - new Date(linkGeneratedAt).getTime() > LINK_MAX_AGE_MS;
+
+  function showManualFallback(value: string) {
+    setManualLink(value);
+    // Focus+select on the next tick so the input exists in the DOM first.
+    setTimeout(() => manualInputRef.current?.select(), 0);
+  }
 
   async function handleClick() {
     if (state === "copying") return;
+    setManualLink(null);
+
+    if (!isStale && link) {
+      // Fast path — the link is already known and fresh, so the clipboard
+      // write is the very first thing that happens after the click, with
+      // no await ahead of it. That's what keeps it inside the browser's
+      // "recent user gesture" window; a network round-trip first is what
+      // was causing "Couldn't copy" on real phones.
+      const ok = await copyToClipboard(link);
+      if (ok) {
+        setState("copied");
+        setTimeout(() => setState("idle"), 2000);
+      } else {
+        showManualFallback(link);
+      }
+      return;
+    }
+
+    // Slow path — link missing or stale (rare: first tap on an invoice
+    // whose link expired from disuse). This necessarily needs a network
+    // round-trip before we know what to copy, so the clipboard call here
+    // is best-effort; the manual fallback below covers it if the browser
+    // refuses the write after the delay.
     setState("copying");
     try {
       const res = await fetch(`/api/invoices/${invoiceId}/link`, {
@@ -19,9 +76,14 @@ export function CopyLinkAction({ invoiceId }: { invoiceId: string }) {
       });
       const data = await res.json();
       if (!res.ok || !data.link) throw new Error(data.error);
-      await navigator.clipboard.writeText(data.link);
-      setState("copied");
-      setTimeout(() => setState("idle"), 2000);
+      const ok = await copyToClipboard(data.link);
+      if (ok) {
+        setState("copied");
+        setTimeout(() => setState("idle"), 2000);
+      } else {
+        showManualFallback(data.link);
+        setState("idle");
+      }
     } catch {
       setState("error");
       setTimeout(() => setState("idle"), 2000);
@@ -36,6 +98,27 @@ export function CopyLinkAction({ invoiceId }: { invoiceId: string }) {
         : state === "error"
           ? "Couldn't copy"
           : "Copy payment link";
+
+  if (manualLink) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <input
+          ref={manualInputRef}
+          readOnly
+          value={manualLink}
+          onFocus={(e) => e.currentTarget.select()}
+          className="w-[110px] rounded-md border border-line bg-bg px-1.5 py-1 font-mono text-[10px] text-text outline-none"
+        />
+        <button
+          type="button"
+          onClick={() => setManualLink(null)}
+          className="text-[11px] font-bold text-muted"
+        >
+          Done
+        </button>
+      </div>
+    );
+  }
 
   return (
     <button
@@ -79,8 +162,7 @@ export function DownloadDocumentAction({
     try {
       const invoiceCode = invoice.id.slice(-6).toUpperCase();
       const filename = `nado-invoice-${invoiceCode}.png`;
-      const file = await renderNodeToPngFile(cardRef.current, filename);
-      await shareOrDownloadFile(file, { title: `Nado invoice #${invoiceCode}` });
+      await renderAndShare(cardRef.current, filename, `Nado invoice #${invoiceCode}`);
     } finally {
       setBusy(false);
     }
