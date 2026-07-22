@@ -19,7 +19,18 @@ export async function POST(request: Request) {
   const signature = request.headers.get("monnify-signature");
 
   // Log raw evidence before any verification/parsing decision, so a rejected
-  // or mismatched request still leaves a trace to debug from.
+  // or mismatched request still leaves a trace to debug from. The explicit
+  // present/absent line exists to answer, from real sandbox traffic, whether
+  // Monnify actually sends this header at all — verifyWebhookSignature
+  // hard-rejects (401, no invoice update) whenever it's missing, so if the
+  // sandbox never sends it, every webhook silently fails closed and the app
+  // only ever gets Paid status via the client-side polling fallback.
+  console.log(
+    "[monnify-webhook] monnify-signature header present:",
+    signature !== null,
+    "| all header names received:",
+    Array.from(request.headers.keys())
+  );
   console.log(
     "[monnify-webhook] raw body:",
     rawBody,
